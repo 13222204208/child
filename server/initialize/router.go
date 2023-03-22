@@ -1,3 +1,11 @@
+/*
+ * @Author: 13222204208 573516293@qq.com
+ * @Date: 2023-03-21 23:39:02
+ * @LastEditors: 13222204208 573516293@qq.com
+ * @LastEditTime: 2023-03-22 15:20:55
+ * @FilePath: /server/initialize/router.go
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 package initialize
 
 import (
@@ -70,6 +78,20 @@ func Routers() *gin.Engine {
 		exampleRouter.InitCustomerRouter(PrivateGroup)              // 客户路由
 		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 
+	}
+	{
+		wechatRouter := router.RouterGroupApp.Wechat
+		wechatRouter.InitMenubarRouter(PrivateGroup)
+		wechatRouter.InitBannerRouter(PrivateGroup)
+
+		wechatGroup := Router.Group("wechat")
+		wechatRouter.InitBannerRouter(wechatGroup)
+		wechatRouter.InitMenubarRouter(wechatGroup)
+		wechatRouter.InitBoardRouter(wechatGroup)
+		wechatRouter.InitMessageRouter(wechatGroup)
+
+		wechatRouter.InitMessageRouter(PrivateGroup)
+		wechatRouter.InitBoardRouter(PrivateGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

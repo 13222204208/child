@@ -53,3 +53,7 @@
 [github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 15:29:02.856	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/initialize/router.go:47	register swagger handler
 [github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 15:29:02.874	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/initialize/router.go:97	router register success
 [github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 15:29:02.874	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/core/server.go:36	server run success on 	{"address": ":9529"}
+[github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 19:37:19.987	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/initialize/gorm.go:57	register table success
+[github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 19:37:20.003	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/initialize/router.go:47	register swagger handler
+[github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 19:37:20.071	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/initialize/router.go:97	router register success
+[github.com/flipped-aurora/gin-vue-admin/server]2023/03/22 - 19:37:20.071	[34minfo[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/core/server.go:36	server run success on 	{"address": ":9529"}

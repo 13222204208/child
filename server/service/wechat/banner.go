@@ -12,7 +12,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
-	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
+	req "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
 )
 
 type BannerService struct {
@@ -55,7 +55,7 @@ func (bannerService *BannerService) GetBanner(id uint) (banner wechat.Banner, er
 
 // GetBannerInfoList 分页获取Banner记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (bannerService *BannerService) GetBannerInfoList(info wechatReq.BannerSearch) (list []wechat.Banner, total int64, err error) {
+func (bannerService *BannerService) GetBannerInfoList(info req.BannerSearch) (list []wechat.Banner, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db

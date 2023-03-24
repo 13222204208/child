@@ -48,7 +48,7 @@ func RegisterTables() {
 		example.ExaFile{},
 		example.ExaCustomer{},
 		example.ExaFileChunk{},
-		example.ExaFileUploadAndDownload{}, wechat.Menubar{}, wechat.Banner{}, wechat.Message{}, wechat.Board{},
+		example.ExaFileUploadAndDownload{}, wechat.Menubar{}, wechat.Banner{}, wechat.Message{}, wechat.Board{}, wechat.WechatUser{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))

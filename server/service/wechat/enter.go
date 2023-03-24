@@ -5,4 +5,5 @@ type ServiceGroup struct {
 	BannerService
 	MessageService
 	BoardService
+	WechatUserService
 }

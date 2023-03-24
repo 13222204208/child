@@ -369,6 +369,16 @@
             </div>
           </template>
         </el-collapse-item>
+
+        <el-collapse-item title="公众号配置" name="14">
+          <el-form-item label="appid">
+            <el-input v-model="config.wechat['appid']" />
+          </el-form-item>
+          <el-form-item label="秘钥">
+            <el-input v-model="config.wechat['secret']" />
+          </el-form-item>
+        </el-collapse-item>
+        
       </el-collapse>
     </el-form>
     <div class="gva-btn-list">
@@ -409,6 +419,7 @@ const config = ref({
   zap: {},
   local: {},
   email: {},
+  wechat: {},
   timer: {
     detail: {}
   }
@@ -416,6 +427,7 @@ const config = ref({
 
 const initForm = async() => {
   const res = await getSystemConfig()
+  console.log(res)
   if (res.code === 0) {
     config.value = res.data.config
   }

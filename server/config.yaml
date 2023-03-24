@@ -198,3 +198,6 @@ zap:
   max-age: 0
   show-line: true
   log-in-console: true
+wechat:
+  appid: wx8f0b412c7686ef72
+  secret: wx8f0b412c7686ef72

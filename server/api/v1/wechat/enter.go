@@ -5,4 +5,5 @@ type ApiGroup struct {
 	BannerApi
 	MessageApi
 	BoardApi
+	WechatUserApi
 }

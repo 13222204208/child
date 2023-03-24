@@ -5,4 +5,5 @@ type RouterGroup struct {
 	BannerRouter
 	MessageRouter
 	BoardRouter
+	WechatUserRouter
 }

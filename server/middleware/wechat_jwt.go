@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	req "github.com/flipped-aurora/gin-vue-admin/server/model/Wechat/request"
+	req "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )

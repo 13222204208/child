@@ -6,4 +6,5 @@ type ServiceGroup struct {
 	MessageService
 	BoardService
 	WechatUserService
+	BabyService
 }

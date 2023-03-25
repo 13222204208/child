@@ -1,6 +1,12 @@
 package wechat
 
 import (
+	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
@@ -168,7 +174,7 @@ func (wechatUserApi *WechatUserApi) GetWechatUserList(c *gin.Context) {
 // 根据code获取微信公众号openid 并保存到wechatUser
 func (wechatUserApi *WechatUserApi) Login(c *gin.Context) {
 	var code wechatReq.WechatCode
-	err := c.ShouldBindQuery(&code)
+	err := c.ShouldBindJSON(&code)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -185,4 +191,52 @@ func (wechatUserApi *WechatUserApi) Login(c *gin.Context) {
 		response.OkWithData(token, c)
 	}
 
+}
+
+// 根据id来保存用户信息
+func (wechatUserApi *WechatUserApi) SaveUserInfo(c *gin.Context) {
+	var userInfo wechatReq.WechatUserInfo
+	err := c.ShouldBindJSON(&userInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	id := c.MustGet("id").(uint)
+	if err := wechatUserService.SaveUserInfo(id, userInfo); err != nil {
+		global.GVA_LOG.Error("保存失败!", zap.Error(err))
+		response.FailWithMessage(err.Error(), c)
+	} else {
+		response.OkWithMessage("保存成功", c)
+	}
+}
+
+func (wechatUserApi *WechatUserApi) UploadFile(c *gin.Context) {
+	file, err := c.FormFile("image")
+	if err != nil {
+		c.String(http.StatusBadRequest, fmt.Sprintf("error: %s", err.Error()))
+		return
+	}
+
+	// 根据日期创建目录
+	dateDir := time.Now().Format("20060102")
+	targetDir := filepath.Join("uploads/pic", dateDir)
+	fmt.Println("图片路径", targetDir)
+	// 创建目录
+	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	// 生成文件名
+	ext := filepath.Ext(file.Filename)
+	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+
+	// 保存文件
+	targetPath := filepath.Join(targetDir, filename)
+	if err := c.SaveUploadedFile(file, targetPath); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	} else {
+		response.OkWithData(gin.H{"path": targetPath}, c)
+	}
 }

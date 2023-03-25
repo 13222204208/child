@@ -90,10 +90,12 @@ func Routers() *gin.Engine {
 		wechatRouter.InitBoardRouter(wechatGroup)
 		wechatRouter.InitMessageRouter(wechatGroup)
 		wechatRouter.InitWechatUserRouter(wechatGroup)
+		wechatRouter.InitBabyRouter(PrivateGroup, wechatGroup)
 
 		wechatRouter.InitMessageRouter(PrivateGroup)
 		wechatRouter.InitBoardRouter(PrivateGroup)
 		wechatRouter.InitWechatUserRouter(PrivateGroup)
+		// wechatRouter.InitBabyRouter(PrivateGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

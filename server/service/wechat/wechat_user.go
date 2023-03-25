@@ -107,6 +107,21 @@ func (wechatUserService *WechatUserService) Login(code string) (token string, er
 	return
 }
 
+// 根据用的id来保存用户信息
+func (wechatUserService *WechatUserService) SaveUserInfo(id uint, userInfo wechatReq.WechatUserInfo) (err error) {
+	var wechatUser wechat.WechatUser
+	err = global.GVA_DB.Where("id = ?", id).First(&wechatUser).Error
+	if err != nil {
+		return
+	}
+	wechatUser.Name = userInfo.Name
+	wechatUser.Phone = userInfo.Phone
+	wechatUser.Address = userInfo.Address
+	wechatUser.City = userInfo.City
+	err = global.GVA_DB.Save(&wechatUser).Error
+	return
+}
+
 // GenToken 生成JWT
 func genToken(id uint) (string, error) {
 	// 创建一个我们自己的声明

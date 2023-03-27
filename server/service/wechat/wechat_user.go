@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"time"
 
+	assist "github.com/13222204208/assist/wechat"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
 	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
 	"github.com/golang-jwt/jwt/v4"
-	w "github.com/silenceper/wechat/v2"
-	"github.com/silenceper/wechat/v2/cache"
-	"github.com/silenceper/wechat/v2/miniprogram/config"
 )
 
 type WechatUserService struct {
@@ -74,35 +72,41 @@ func (wechatUserService *WechatUserService) GetWechatUserInfoList(info wechatReq
 	return wechatUsers, total, err
 }
 
-func (wechatUserService *WechatUserService) Login(code string) (token string, err error) {
+func (wechatUserService *WechatUserService) Login(code string) (token string, exist int, err error) {
 	fmt.Println("code:", code)
 	openid, err := GetWechatOpenid(code)
+	fmt.Println("openid:", openid)
 	if err != nil {
 		return
 	}
 	if openid != "" {
 		var wechatUser wechat.WechatUser
-		err = global.GVA_DB.Where("openid = ?", openid).First(&wechatUser).Error
-		if err != nil {
-			return
-		}
+		global.GVA_DB.Where("openid = ?", openid).First(&wechatUser)
+
 		uid := wechatUser.ID
 		if uid > 0 {
 			token, err = genToken(uid)
 			if err != nil {
 				return
+			} else {
+				return token, 1, err
 			}
 		} else {
 			wechatUser.Openid = openid
+			fmt.Println("Openid:", openid)
 			err = global.GVA_DB.Create(&wechatUser).Error
 			if err != nil {
 				return
 			}
+			fmt.Println("wechatUser.ID:", wechatUser.ID)
 			token, err = genToken(wechatUser.ID)
+			fmt.Println("token:", token)
 			if err != nil {
 				return
 			}
 		}
+	} else {
+		err = errors.New("openid 为空")
 	}
 	return
 }
@@ -138,27 +142,18 @@ func genToken(id uint) (string, error) {
 	return token.SignedString(wechatReq.MySecret)
 }
 
-// 获取微信小程序的openid
+// 获取微信公众号的openid
 func GetWechatOpenid(code string) (s string, err error) {
 	appid := global.GVA_CONFIG.Wechat.Appid
 	secret := global.GVA_CONFIG.Wechat.Secret
 	if appid == "" || secret == "" {
 		return s, errors.New("appid或secret为空")
 	}
-	wc := w.NewWechat()
-	memory := cache.NewMemory()
-	cfg := &config.Config{
-		AppID:     appid,
-		AppSecret: secret,
-		Cache:     memory,
-	}
-	min := wc.GetMiniProgram(cfg)
-	a := min.GetAuth()
-	r, errs := a.Code2Session(code)
-
-	if errs != nil {
-		return s, errors.New(errs.Error())
+	openid, err := assist.GetWechatH5Openid(appid, secret, code)
+	fmt.Println("openid:", openid, "err:", err)
+	if err != nil {
+		return s, errors.New(err.Error())
 	} else {
-		return r.OpenID, nil
+		return openid, nil
 	}
 }

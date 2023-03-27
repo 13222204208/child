@@ -151,6 +151,7 @@ const chooseImgRef = ref()
 
 const basePath = ref(import.meta.env.VITE_IMAGE_URL)
 console.log(basePath.value)
+
 const openChooseImg = () => {
   chooseImgRef.value.open()
 }

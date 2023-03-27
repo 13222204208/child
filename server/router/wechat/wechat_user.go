@@ -15,7 +15,7 @@ func (s *WechatUserRouter) InitWechatUserRouter(Router *gin.RouterGroup) {
 	wechatUserRouterWithoutRecord := Router.Group("wechatUser")
 
 	wechatUserPublicRouter := Router.Group("user")
-	wechatUserPrivateRouter := Router.Group("user").Use(middleware.JWTAuth())
+	wechatUserPrivateRouter := Router.Group("user").Use(middleware.JWTAuthMiddleware())
 
 	var wechatUserApi = v1.ApiGroupApp.WechatApiGroup.WechatUserApi
 	{

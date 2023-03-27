@@ -14,7 +14,7 @@ func (s *BabyRouter) InitBabyRouter(Router *gin.RouterGroup, privateRouter *gin.
 	babyRouter := Router.Group("baby").Use(middleware.OperationRecord())
 	babyRouterWithoutRecord := Router.Group("baby")
 
-	babyPrivateRouter := privateRouter.Group("baby").Use(middleware.JWTAuth())
+	babyPrivateRouter := privateRouter.Group("baby").Use(middleware.JWTAuthMiddleware())
 
 	var babyApi = v1.ApiGroupApp.WechatApiGroup.BabyApi
 	{
@@ -29,5 +29,6 @@ func (s *BabyRouter) InitBabyRouter(Router *gin.RouterGroup, privateRouter *gin.
 	}
 	{
 		babyPrivateRouter.POST("save", babyApi.SaveBaby) // 保存Baby
+		babyPrivateRouter.GET(":id", babyApi.Info)
 	}
 }

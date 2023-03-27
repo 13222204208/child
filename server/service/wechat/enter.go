@@ -7,4 +7,7 @@ type ServiceGroup struct {
 	BoardService
 	WechatUserService
 	BabyService
+	AgencyService
+	AffirmService
+	EmergencyAlertService
 }

@@ -31,4 +31,7 @@ type Server struct {
 
 	//公众号配置
 	Wechat Wechat `mapstructure:"wechat" json:"wechat" yaml:"wechat"`
+
+	//手机短信配置
+	Phone Phone `mapstructure:"phone" json:"phone" yaml:"phone"`
 }

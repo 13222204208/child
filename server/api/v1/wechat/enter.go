@@ -7,4 +7,7 @@ type ApiGroup struct {
 	BoardApi
 	WechatUserApi
 	BabyApi
+	AgencyApi
+	AffirmApi
+	EmergencyAlertApi
 }

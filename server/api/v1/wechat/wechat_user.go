@@ -184,11 +184,11 @@ func (wechatUserApi *WechatUserApi) Login(c *gin.Context) {
 		return
 	}
 
-	if token, err := wechatUserService.Login(code.Code); err != nil {
+	if token, exist, err := wechatUserService.Login(code.Code); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 	} else {
-		response.OkWithData(token, c)
+		response.OkWithData(gin.H{"token": token, "exist": exist}, c)
 	}
 
 }

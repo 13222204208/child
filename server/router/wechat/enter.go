@@ -7,4 +7,7 @@ type RouterGroup struct {
 	BoardRouter
 	WechatUserRouter
 	BabyRouter
+	AgencyRouter
+	AffirmRouter
+	EmergencyAlertRouter
 }

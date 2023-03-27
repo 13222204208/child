@@ -11,6 +11,9 @@
     {
       "path": ".",
       "name": "root"
+    },
+    {
+      "path": "../../../../copilot"
     }
   ],
   "settings": {

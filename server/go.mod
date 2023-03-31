@@ -3,7 +3,7 @@ module github.com/flipped-aurora/gin-vue-admin/server
 go 1.18
 
 require (
-	github.com/13222204208/assist v0.0.0-20230326155529-10a51c6fea02
+	github.com/13222204208/assist v0.0.0-20230330090754-ffa20f07095b
 	github.com/13222204208/tool v0.0.0-20230325062516-463d354c42d6
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.6+incompatible

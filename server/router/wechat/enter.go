@@ -10,4 +10,7 @@ type RouterGroup struct {
 	AgencyRouter
 	AffirmRouter
 	EmergencyAlertRouter
+	IdentityRouter
+	ContactRouter
+	ScanRouter
 }

@@ -14,7 +14,7 @@
       </el-form>
     </div>
     <div class="gva-table-box">
-        <div class="gva-btn-list">
+        <!-- <div class="gva-btn-list">
             <el-button type="primary" icon="plus" @click="openDialog">新增</el-button>
             <el-popover v-model:visible="deleteVisible" placement="top" width="160">
             <p>确定要删除吗？</p>
@@ -26,7 +26,7 @@
                 <el-button icon="delete" style="margin-left: 10px;" :disabled="!multipleSelection.length" @click="deleteVisible = true">删除</el-button>
             </template>
             </el-popover>
-        </div>
+        </div> -->
         <el-table
         ref="multipleTable"
         style="width: 100%"
@@ -35,21 +35,21 @@
         row-key="ID"
         @selection-change="handleSelectionChange"
         >
-        <el-table-column type="selection" width="55" />
+        <!-- <el-table-column type="selection" width="55" /> -->
         <el-table-column align="left" label="日期" width="180">
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
         <el-table-column align="left" label="走失位置" prop="lostLocation" width="120" />
         <el-table-column align="left" label="走丢时间" prop="lostTime" width="120" />
-        <el-table-column align="left" label="经度" prop="longitude" width="120" />
-        <el-table-column align="left" label="纬度" prop="latitude" width="120" />
+        <!-- <el-table-column align="left" label="经度" prop="longitude" width="120" />
+        <el-table-column align="left" label="纬度" prop="latitude" width="120" /> -->
         <el-table-column align="left" label="宝贝ID" prop="babyId" width="120" />
         <el-table-column align="left" label="紧急联系人" prop="contactPerson" width="120" />
         <el-table-column align="left" label="其它特征" prop="otherFeatures" width="120" />
         <el-table-column align="left" label="状态" prop="status" width="120" />
         <el-table-column align="left" label="按钮组">
             <template #default="scope">
-            <el-button type="primary" link icon="edit" class="table-button" @click="updateEmergencyAlertFunc(scope.row)">变更</el-button>
+            <el-button type="primary" link icon="edit" class="table-button" @click="updateEmergencyAlertFunc(scope.row)">确认</el-button>
             <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -67,14 +67,14 @@
         </div>
     </div>
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="弹窗操作">
-      <el-form :model="formData" label-position="right" ref="elFormRef" :rules="rule" label-width="80px">
+      <el-form :model="formData" label-position="right" ref="elFormRef" :rules="rule" label-width="120px">
         <el-form-item label="走失位置:"  prop="lostLocation" >
-          <el-input v-model="formData.lostLocation" :clearable="true"  placeholder="请输入" />
+          <el-input v-model="formData.lostLocation" :clearable="true" disabled placeholder="请输入" />
         </el-form-item>
         <el-form-item label="走丢时间:"  prop="lostTime" >
-          <el-input v-model="formData.lostTime" :clearable="true"  placeholder="请输入" />
+          <el-input v-model="formData.lostTime" :clearable="true" disabled  placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="经度:"  prop="longitude" >
+        <!-- <el-form-item label="经度:"  prop="longitude" >
           <el-input v-model="formData.longitude" :clearable="true"  placeholder="请输入" />
         </el-form-item>
         <el-form-item label="纬度:"  prop="latitude" >
@@ -85,12 +85,15 @@
         </el-form-item>
         <el-form-item label="紧急联系人:"  prop="contactPerson" >
           <el-input v-model="formData.contactPerson" :clearable="true"  placeholder="请输入" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="其它特征:"  prop="otherFeatures" >
-          <el-input v-model="formData.otherFeatures" :clearable="true"  placeholder="请输入" />
+          <el-input v-model="formData.otherFeatures" type="textarea" :clearable="true" disabled  placeholder="请输入" />
         </el-form-item>
         <el-form-item label="状态:"  prop="status" >
-          <el-input v-model.number="formData.status" :clearable="true" placeholder="请输入" />
+          <el-radio-group v-model="formData.status" class="ml-4">
+            <el-radio :label=0 size="large">取消发布</el-radio>
+            <el-radio :label=1 size="large">发布</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -325,6 +328,9 @@ const enterDialog = async () => {
                   res = await createEmergencyAlert(formData.value)
                   break
                 case 'update':
+                  console.log(formData.value)
+                  //formData.value.status 转为int类型
+                  formData.value.status = parseInt(formData.value.status)
                   res = await updateEmergencyAlert(formData.value)
                   break
                 default:

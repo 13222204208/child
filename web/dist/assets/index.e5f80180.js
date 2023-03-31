@@ -1,4 +1,0 @@
-/*! 
- Build based on gin-vue-admin 
- Time : 1679909256000 */
-import{bf as a,r as s,aA as e,o,c as l,e as d,w as t,J as r,d as i,h as n,j as c,av as u}from"./index.61dd0a2d.js";import{E as p}from"./upload.55e3c344.js";import"./progress.d509d1cc.js";/* empty css             */const m=i("div",{class:"el-upload__text"},[n(" 拖拽或"),i("em",null,"点击上传")],-1),f=i("div",{class:"el-upload__tip"}," 请把安装包的zip拖拽至此处上传 ",-1),_={__name:"index",setup(i){const n=a(),_=s("/api"),g=a=>{if(0===a.code){let s="";a.data&&a.data.forEach(((a,e)=>{s+=`${e+1}.${a.msg}\n`})),alert(s)}else c.error(a.msg)};return(a,s)=>{const i=e("upload-filled"),c=u,h=p;return o(),l("div",null,[d(h,{class:"upload-demo",drag:"",action:`${_.value}/autoCode/installPlugin`,headers:{"x-token":r(n).token},"show-file-list":!1,"on-success":g,"on-error":g,name:"plug"},{tip:t((()=>[f])),default:t((()=>[d(c,{class:"el-icon--upload"},{default:t((()=>[d(i)])),_:1}),m])),_:1},8,["action","headers"])])}}};export{_ as default};

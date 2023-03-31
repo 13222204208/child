@@ -78,6 +78,13 @@ func (babyService *BabyService) GetBabyInfoList(info wechatReq.BabySearch) (list
 // 保存baby信息
 func (babyService *BabyService) SaveBabyInfo(baby wechat.Baby) (babyId uint, err error) {
 	//根据baby的uid和name查询是否存在
+	if baby.ID != 0 {
+		// err = global.GVA_DB.Save(&baby).Error
+		err = global.GVA_DB.Model(&baby).Updates(baby).Error
+		babyId = baby.ID
+		return
+	}
+
 	var babyInfo wechat.Baby
 	err = global.GVA_DB.Where("uid = ? and name = ?", baby.Uid, baby.Name).First(&babyInfo).Error
 	babyId = babyInfo.ID
@@ -162,5 +169,12 @@ func VerifyPhoneCode(phoneNumber, phoneCode string) error {
 
 func (babyService *BabyService) Info(id string) (baby wechat.Baby, err error) {
 	err = global.GVA_DB.Where("id = ?", id).First(&baby).Error
+	return
+}
+
+// 根据uid获取 baby list
+func (babyService *BabyService) GetBabyListByUid(uid uint) (babyList []wechat.Baby, err error) {
+
+	err = global.GVA_DB.Where("uid = ?", uid).Find(&babyList).Error
 	return
 }

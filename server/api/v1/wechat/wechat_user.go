@@ -173,41 +173,24 @@ func (wechatUserApi *WechatUserApi) GetWechatUserList(c *gin.Context) {
 
 // 根据code获取微信公众号openid 并保存到wechatUser
 func (wechatUserApi *WechatUserApi) Login(c *gin.Context) {
-	var code wechatReq.WechatCode
-	err := c.ShouldBindJSON(&code)
-	if err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
-	if code.Code == "" {
-		response.FailWithMessage("code不能为空", c)
-		return
-	}
-
-	if token, exist, err := wechatUserService.Login(code.Code); err != nil {
-		global.GVA_LOG.Error("获取失败!", zap.Error(err))
-		response.FailWithMessage(err.Error(), c)
-	} else {
-		response.OkWithData(gin.H{"token": token, "exist": exist}, c)
-	}
-
-}
-
-// 根据id来保存用户信息
-func (wechatUserApi *WechatUserApi) SaveUserInfo(c *gin.Context) {
 	var userInfo wechatReq.WechatUserInfo
 	err := c.ShouldBindJSON(&userInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	id := c.MustGet("id").(uint)
-	if err := wechatUserService.SaveUserInfo(id, userInfo); err != nil {
-		global.GVA_LOG.Error("保存失败!", zap.Error(err))
+	if userInfo.Code == "" {
+		response.FailWithMessage("code不能为空", c)
+		return
+	}
+
+	if token, err := wechatUserService.Login(userInfo); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 	} else {
-		response.OkWithMessage("保存成功", c)
+		response.OkWithData(gin.H{"token": token}, c)
 	}
+
 }
 
 func (wechatUserApi *WechatUserApi) UploadFile(c *gin.Context) {
@@ -219,7 +202,7 @@ func (wechatUserApi *WechatUserApi) UploadFile(c *gin.Context) {
 
 	// 根据日期创建目录
 	dateDir := time.Now().Format("20060102")
-	targetDir := filepath.Join("uploads/pic", dateDir)
+	targetDir := filepath.Join("uploads/file/pic", dateDir)
 	fmt.Println("图片路径", targetDir)
 	// 创建目录
 	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {

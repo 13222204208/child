@@ -30,5 +30,7 @@ func (s *BabyRouter) InitBabyRouter(Router *gin.RouterGroup, privateRouter *gin.
 	{
 		babyPrivateRouter.POST("save", babyApi.SaveBaby) // 保存Baby
 		babyPrivateRouter.GET(":id", babyApi.Info)
+		babyPrivateRouter.GET("list", babyApi.List)
+		babyPrivateRouter.POST("sendCode", babyApi.SendCode) // 发送验证码
 	}
 }

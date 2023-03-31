@@ -11,8 +11,8 @@ cloud.google.com/go/firestore v1.1.0/go.mod h1:ulACoGHTpvq5r8rxGJ4ddJZBZqakUQqCl
 cloud.google.com/go/pubsub v1.0.1/go.mod h1:R0Gpsv3s54REJCy4fxDixWD93lHJMoZTyQ2kNxGRt3I=
 cloud.google.com/go/storage v1.0.0/go.mod h1:IhtSnM/ZTZV8YYJWCY8RULGVqBDmpoyjwiyrjsg+URw=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
-github.com/13222204208/assist v0.0.0-20230326155529-10a51c6fea02 h1:xl4XXrIH/gZcaCSpklsDF2ESZfXsdwWwAT6ge6S0SZI=
-github.com/13222204208/assist v0.0.0-20230326155529-10a51c6fea02/go.mod h1:5NNp9ujjh18nI5kL7lk7+my/OA9QHQpMtxl8qBsh8do=
+github.com/13222204208/assist v0.0.0-20230330090754-ffa20f07095b h1:zjoTRHo0/ImmlPQTW7U01toLpeS1sDa5At3/ug/3ZiU=
+github.com/13222204208/assist v0.0.0-20230330090754-ffa20f07095b/go.mod h1:5NNp9ujjh18nI5kL7lk7+my/OA9QHQpMtxl8qBsh8do=
 github.com/13222204208/tool v0.0.0-20230325062516-463d354c42d6 h1:xb55dVTrrntGLl/B0Yruva+9DXPJBTO3SbpgcpmG7X0=
 github.com/13222204208/tool v0.0.0-20230325062516-463d354c42d6/go.mod h1:C2jHoPFJj4nNy2ITUe3mCkGK2TNOjcMLUWJ0ozUYsVw=
 github.com/Azure/azure-sdk-for-go/sdk/azcore v0.19.0/go.mod h1:h6H6c8enJmmocHUbLiiGY6sx7f9i+X3m1CHdd5c6Rdw=

@@ -10,4 +10,7 @@ type ServiceGroup struct {
 	AgencyService
 	AffirmService
 	EmergencyAlertService
+	IdentityService
+	ContactService
+	ScanService
 }

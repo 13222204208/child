@@ -10,4 +10,7 @@ type ApiGroup struct {
 	AgencyApi
 	AffirmApi
 	EmergencyAlertApi
+	IdentityApi
+	ContactApi
+	ScanApi
 }

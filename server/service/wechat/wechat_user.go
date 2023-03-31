@@ -1,8 +1,11 @@
 package wechat
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
 	"time"
 
 	assist "github.com/13222204208/assist/wechat"
@@ -72,9 +75,25 @@ func (wechatUserService *WechatUserService) GetWechatUserInfoList(info wechatReq
 	return wechatUsers, total, err
 }
 
-func (wechatUserService *WechatUserService) Login(code string) (token string, exist int, err error) {
+func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserInfo) (token string, err error) {
+	code := userInfo.Code
 	fmt.Println("code:", code)
-	openid, err := GetWechatOpenid(code)
+	openid, accessToken, err := GetWechatOpenid(code)
+	if err != nil {
+		return
+	}
+
+	url := "https://api.weixin.qq.com/sns/userinfo?access_token=" + accessToken + "&openid=" + openid + "&lang=zh_CN"
+	res, err := GetUserInfo(url)
+	if err != nil {
+		return
+	}
+	//res解析到userinfo
+	var info userinfo
+	err = json.Unmarshal(res, &info)
+	if err != nil {
+		return
+	}
 	fmt.Println("openid:", openid)
 	if err != nil {
 		return
@@ -89,10 +108,16 @@ func (wechatUserService *WechatUserService) Login(code string) (token string, ex
 			if err != nil {
 				return
 			} else {
-				return token, 1, err
+				return token, err
 			}
 		} else {
 			wechatUser.Openid = openid
+			wechatUser.Nickname = info.Nickname
+			wechatUser.Avatar = info.Headimgurl
+			wechatUser.Name = userInfo.Name
+			wechatUser.Phone = userInfo.Phone
+			wechatUser.City = userInfo.City
+			wechatUser.Address = userInfo.Address
 			fmt.Println("Openid:", openid)
 			err = global.GVA_DB.Create(&wechatUser).Error
 			if err != nil {
@@ -108,21 +133,6 @@ func (wechatUserService *WechatUserService) Login(code string) (token string, ex
 	} else {
 		err = errors.New("openid 为空")
 	}
-	return
-}
-
-// 根据用的id来保存用户信息
-func (wechatUserService *WechatUserService) SaveUserInfo(id uint, userInfo wechatReq.WechatUserInfo) (err error) {
-	var wechatUser wechat.WechatUser
-	err = global.GVA_DB.Where("id = ?", id).First(&wechatUser).Error
-	if err != nil {
-		return
-	}
-	wechatUser.Name = userInfo.Name
-	wechatUser.Phone = userInfo.Phone
-	wechatUser.Address = userInfo.Address
-	wechatUser.City = userInfo.City
-	err = global.GVA_DB.Save(&wechatUser).Error
 	return
 }
 
@@ -143,17 +153,42 @@ func genToken(id uint) (string, error) {
 }
 
 // 获取微信公众号的openid
-func GetWechatOpenid(code string) (s string, err error) {
+func GetWechatOpenid(code string) (s, a string, err error) {
 	appid := global.GVA_CONFIG.Wechat.Appid
 	secret := global.GVA_CONFIG.Wechat.Secret
 	if appid == "" || secret == "" {
-		return s, errors.New("appid或secret为空")
+		return s, a, errors.New("appid或secret为空")
 	}
-	openid, err := assist.GetWechatH5Openid(appid, secret, code)
+	openid, accessToken, err := assist.GetWechatH5OpenidAndAccessToken(appid, secret, code)
 	fmt.Println("openid:", openid, "err:", err)
 	if err != nil {
-		return s, errors.New(err.Error())
+		return s, a, errors.New(err.Error())
 	} else {
-		return openid, nil
+		return openid, accessToken, nil
 	}
+}
+
+type userinfo struct {
+	Openid     string   `json:"openid"`
+	Nickname   string   `json:"nickname"`
+	Sex        int      `json:"sex"`
+	Province   string   `json:"province"`
+	City       string   `json:"city"`
+	Country    string   `json:"country"`
+	Headimgurl string   `json:"headimgurl"`
+	Privilege  []string `json:"privilege"`
+	Unionid    string   `json:"unionid"`
+}
+
+func GetUserInfo(url string) (r []byte, err error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer resp.Body.Close()
+	r, err = io.ReadAll(resp.Body)
+	// r = string(body)
+	// fmt.Println("返回的结果", r)
+	return
 }

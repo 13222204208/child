@@ -14,13 +14,10 @@ type WechatUserSearch struct {
 	request.PageInfo
 }
 
-type WechatCode struct {
-	Code string `json:"code" form:"code"`
-}
-
 type WechatUserInfo struct {
 	Name    string `json:"name" form:"name"`
 	Phone   string `json:"phone" form:"phone"`
 	Address string `json:"address" form:"address"`
 	City    string `json:"city" form:"city"`
+	Code    string `json:"code" form:"code"` //微信授权code
 }

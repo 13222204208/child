@@ -190,14 +190,7 @@ func (babyApi *BabyApi) SaveBaby(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	verify := utils.Rules{
-		"Name":   {utils.NotEmpty()},
-		"Gender": {utils.NotEmpty()},
-	}
-	if err := utils.Verify(baby, verify); err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
+
 	baby.Uid = c.MustGet("id").(uint)
 
 	if babyId, err := babyService.SaveBabyInfo(baby); err != nil {
@@ -219,5 +212,32 @@ func (babyApi *BabyApi) Info(c *gin.Context) {
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"rebaby": rebaby}, c)
+	}
+}
+
+// get babylist api
+func (babyApi *BabyApi) List(c *gin.Context) {
+	uid := c.MustGet("id").(uint)
+	if list, err := babyService.GetBabyListByUid(uid); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(gin.H{"list": list}, c)
+	}
+}
+
+// sendCode api
+func (babyApi *BabyApi) SendCode(c *gin.Context) {
+	var p wechatReq.SendCode
+	err := c.ShouldBindJSON(&p)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if err := babyService.SendCode(p.Phone); err != nil {
+		global.GVA_LOG.Error("发送失败!", zap.Error(err))
+		response.FailWithMessage("发送失败", c)
+	} else {
+		response.OkWithMessage("发送成功", c)
 	}
 }

@@ -1,6 +1,8 @@
 package wechat
 
 import (
+	"strconv"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
@@ -114,15 +116,15 @@ func (emergencyAlertApi *EmergencyAlertApi) UpdateEmergencyAlert(c *gin.Context)
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	verify := utils.Rules{
-		"LostLocation": {utils.NotEmpty()},
-		"LostTime":     {utils.NotEmpty()},
-		"BabyId":       {utils.NotEmpty()},
-	}
-	if err := utils.Verify(emergencyAlert, verify); err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
+	// verify := utils.Rules{
+	// 	"LostLocation": {utils.NotEmpty()},
+	// 	"LostTime":     {utils.NotEmpty()},
+	// 	"BabyId":       {utils.NotEmpty()},
+	// }
+	// if err := utils.Verify(emergencyAlert, verify); err != nil {
+	// 	response.FailWithMessage(err.Error(), c)
+	// 	return
+	// }
 	if err := emergencyAlertService.UpdateEmergencyAlert(emergencyAlert); err != nil {
 		global.GVA_LOG.Error("更新失败!", zap.Error(err))
 		response.FailWithMessage("更新失败", c)
@@ -208,5 +210,32 @@ func (emergencyAlertApi *EmergencyAlertApi) Issue(c *gin.Context) {
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("发布成功", c)
+	}
+}
+
+// GetEmergencyAlertList api
+func (emergencyAlertApi *EmergencyAlertApi) List(c *gin.Context) {
+	if list, err := emergencyAlertService.GetEmergencyAlertList(); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(gin.H{"list": list}, "获取成功", c)
+	}
+}
+
+// findEmergencyAlertById
+func (emergencyAlertApi *EmergencyAlertApi) FindEmergencyAlertById(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		response.FailWithMessage("id不能为空", c)
+		return
+	}
+	//id 转为int
+	idInt, _ := strconv.Atoi(id)
+	if reemergencyAlert, err := emergencyAlertService.GetEmergencyAlertById(idInt); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Error(err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"info": reemergencyAlert}, c)
 	}
 }

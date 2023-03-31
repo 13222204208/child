@@ -15,7 +15,6 @@ func (s *WechatUserRouter) InitWechatUserRouter(Router *gin.RouterGroup) {
 	wechatUserRouterWithoutRecord := Router.Group("wechatUser")
 
 	wechatUserPublicRouter := Router.Group("user")
-	wechatUserPrivateRouter := Router.Group("user").Use(middleware.JWTAuthMiddleware())
 
 	var wechatUserApi = v1.ApiGroupApp.WechatApiGroup.WechatUserApi
 	{
@@ -34,7 +33,4 @@ func (s *WechatUserRouter) InitWechatUserRouter(Router *gin.RouterGroup) {
 		wechatUserPublicRouter.POST("upload", wechatUserApi.UploadFile) //上传文件
 	}
 
-	{
-		wechatUserPrivateRouter.POST("save", wechatUserApi.SaveUserInfo) //保存用户信息
-	}
 }

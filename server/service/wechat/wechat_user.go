@@ -9,11 +9,12 @@ import (
 	"time"
 
 	assist "github.com/13222204208/assist/wechat"
+	"github.com/golang-jwt/jwt/v4"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
 	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
-	"github.com/golang-jwt/jwt/v4"
 )
 
 type WechatUserService struct {
@@ -83,6 +84,14 @@ func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserI
 		return
 	}
 
+	ok, err := assist.IsSubscribe(openid, accessToken)
+	if err != nil {
+		return
+	}
+	if !ok {
+		err = errors.New("未关注公众号")
+		return
+	}
 	url := "https://api.weixin.qq.com/sns/userinfo?access_token=" + accessToken + "&openid=" + openid + "&lang=zh_CN"
 	res, err := GetUserInfo(url)
 	if err != nil {

@@ -7,14 +7,15 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
 	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type WechatUserApi struct {
@@ -184,13 +185,34 @@ func (wechatUserApi *WechatUserApi) Login(c *gin.Context) {
 		return
 	}
 
-	if token, err := wechatUserService.Login(userInfo); err != nil {
+	if token, exist, err := wechatUserService.Login(userInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 	} else {
-		response.OkWithData(gin.H{"token": token}, c)
+		response.OkWithData(gin.H{"token": token, "exist": exist}, c)
 	}
 
+}
+
+// save user api
+func (wechatUserApi *WechatUserApi) SaveUser(c *gin.Context) {
+	var userInfo wechat.WechatUser
+	err := c.ShouldBindJSON(&userInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if userInfo.Phone == "" {
+		response.FailWithMessage("手机号不能为空", c)
+		return
+	}
+	userInfo.ID = c.MustGet("id").(uint)
+	if err = wechatUserService.SaveWechatUser(userInfo); err != nil {
+		global.GVA_LOG.Error("保存失败!", zap.Error(err))
+		response.FailWithMessage(err.Error(), c)
+	} else {
+		response.OkWithMessage("保存成功", c)
+	}
 }
 
 func (wechatUserApi *WechatUserApi) UploadFile(c *gin.Context) {

@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/13222204208/assist v0.0.0-20230331131607-1b8b50aac48f
+	github.com/13222204208/copilot v0.0.0-20230407130845-aaffee66c02b
 	github.com/13222204208/tool v0.0.0-20230325062516-463d354c42d6
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.6+incompatible
@@ -33,6 +34,7 @@ require (
 	github.com/stretchr/testify v1.7.1
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.633
 	github.com/tencentyun/cos-go-sdk-v5 v0.7.19
 	github.com/unrolled/secure v1.0.7
 	go.uber.org/zap v1.16.0
@@ -110,6 +112,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/iai v1.0.633
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect

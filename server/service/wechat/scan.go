@@ -2,7 +2,13 @@ package wechat
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
+
+	"github.com/13222204208/copilot"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	tencentErrors "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	iai "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/iai/v20200303"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
@@ -80,15 +86,51 @@ func (scanService *ScanService) Contrast(pic, address string, uid uint) (info we
 		if err != nil {
 			return info, err
 		}
-		// 对比图片
-		if img == pic {
-			info = v
-			err = SaveScan(uid, v.ID, address)
-			if err != nil {
-				return info, err
+		if img != "" {
+			picBase64, _ := copilot.PrefixImgBase64(pic)
+			imgBase64, _ := copilot.PrefixImgBase64(img)
+
+			credential := common.NewCredential(
+				"AKIDTozylMrALI7j9MbGl6EAEAD3tvukLjut",
+				"ta8WikhVEpGk9TGwZCzdDmIqMuOwNdjo",
+			)
+			// 实例化一个client选项，可选的，没有特殊需求可以跳过
+			cpf := profile.NewClientProfile()
+			cpf.HttpProfile.Endpoint = "iai.tencentcloudapi.com"
+			// 实例化要请求产品的client对象,clientProfile是可选的
+			client, _ := iai.NewClient(credential, "ap-beijing", cpf)
+
+			// 实例化一个请求对象,每个接口都会对应一个request对象
+			request := iai.NewCompareFaceRequest()
+			request.ImageA = &picBase64
+			request.ImageB = &imgBase64
+			// 返回的resp是一个CompareFaceResponse的实例，与请求对象对应
+			response, err := client.CompareFace(request)
+			if _, ok := err.(*tencentErrors.TencentCloudSDKError); ok {
+				fmt.Printf("An API error has returned: %s", err)
 			}
-		} else {
-			return info, errors.New("无法查询到相应的宝宝信息")
+			if err != nil {
+				// panic(err)
+				fmt.Println("err错误", err)
+			} else {
+				// 输出json格式的字符串回包
+				score := response.Response.Score
+				// var resMap map[string]interface{}
+				// err = json.Unmarshal([]byte(infoRes), &resMap)
+				// if err != nil {
+				// 	fmt.Println("err", err)
+				// }
+				fmt.Println("resMap返回的相似度", *score, "地址", address, "图片", pic)
+				if *score > 80 {
+					err = SaveScan(uid, v.ID, address, pic)
+					if err != nil {
+						fmt.Println("保存错误", err)
+						return info, err
+					} else {
+						return v, nil
+					}
+				}
+			}
 		}
 	}
 	return
@@ -97,11 +139,12 @@ func (scanService *ScanService) Contrast(pic, address string, uid uint) (info we
 // 查询出所有发布预警的信息
 func GetEmergencyBaby() (baby []wechat.Baby, err error) {
 	//查询出所有EmergencyAlert 中的 baby_id 并去重
-	var emergencyAlert []wechat.EmergencyAlert
-	err = global.GVA_DB.Model(&wechat.EmergencyAlert{}).Select("baby_id").Group("baby_id").Find(&emergencyAlert).Error
+	var emergencyAlert []uint
+	err = global.GVA_DB.Model(&wechat.EmergencyAlert{}).Pluck("baby_id", &emergencyAlert).Error
 	if err != nil {
 		return
 	}
+	fmt.Println("查询出的baby_id", emergencyAlert, "长度", len(emergencyAlert))
 	//根据 baby_id 查询出所有的baby
 	err = global.GVA_DB.Model(&wechat.Baby{}).Where("id in ?", emergencyAlert).Find(&baby).Error
 
@@ -123,11 +166,12 @@ func ParseJsonArray(jsonStr string) (img string, err error) {
 }
 
 // save scan info
-func SaveScan(uid, babyId uint, address string) (err error) {
+func SaveScan(uid, babyId uint, address, pic string) (err error) {
 	var scan wechat.Scan
-	*scan.Uid = uid
-	*scan.BabyId = babyId
+	scan.Uid = &uid
+	scan.BabyId = &babyId
 	scan.Address = address
+	scan.Pic = pic
 	err = global.GVA_DB.Create(&scan).Error
 	return err
 }

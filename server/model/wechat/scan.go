@@ -13,7 +13,7 @@ type Scan struct {
 	Method  string `json:"method" form:"method" gorm:"column:method;comment:默认为拍照识别;default:拍照识别;"`
 	Address string `json:"address" form:"address" gorm:"column:address;comment:;"`
 	BabyId  *uint  `json:"babyId" form:"babyId" gorm:"column:baby_id;comment:被扫描的宝贝ID;"`
-	Pic     string `json:"pic" form:"pic" gorm:"column:pic;comment:扫描的图片;"`
+	Pic     string `json:"pic" form:"pic" gorm:"column:pic;comment:扫描的图片;type:longtext"`
 	Status  string `json:"status" form:"status" gorm:"column:status;comment:扫描状态;"`
 }
 

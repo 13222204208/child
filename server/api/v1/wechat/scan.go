@@ -1,14 +1,17 @@
 package wechat
 
 import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
 	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type ScanApi struct {
@@ -169,6 +172,7 @@ func (scanApi *ScanApi) GetScanList(c *gin.Context) {
 func (scanApi *ScanApi) Contrast(c *gin.Context) {
 	var scan wechatReq.ScanCompare
 	err := c.ShouldBindJSON(&scan)
+	fmt.Println("请求的数据", scan)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -177,6 +181,12 @@ func (scanApi *ScanApi) Contrast(c *gin.Context) {
 		response.FailWithMessage("图片不能为空", c)
 		return
 	}
+
+	if scan.Address == "" {
+		response.FailWithMessage("地址不能为空", c)
+		return
+	}
+
 	uid := c.MustGet("id").(uint)
 	if info, err := scanService.Contrast(scan.Pic, scan.Address, uid); err != nil {
 		global.GVA_LOG.Error("保存失败!", zap.Error(err))

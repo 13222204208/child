@@ -76,7 +76,7 @@ func (wechatUserService *WechatUserService) GetWechatUserInfoList(info wechatReq
 	return wechatUsers, total, err
 }
 
-func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserInfo) (token string, err error) {
+func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserInfo) (token string, exist int, err error) {
 	code := userInfo.Code
 	fmt.Println("code:", code)
 	openid, accessToken, err := GetWechatOpenid(code)
@@ -84,14 +84,14 @@ func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserI
 		return
 	}
 
-	ok, err := assist.IsSubscribe(openid, accessToken)
-	if err != nil {
-		return
-	}
-	if !ok {
-		err = errors.New("未关注公众号")
-		return
-	}
+	// ok, err := assist.IsSubscribe(openid, accessToken)
+	// if err != nil {
+	// 	return
+	// }
+	// if !ok {
+	// 	err = errors.New("未关注公众号")
+	// 	return
+	// }
 	url := "https://api.weixin.qq.com/sns/userinfo?access_token=" + accessToken + "&openid=" + openid + "&lang=zh_CN"
 	res, err := GetUserInfo(url)
 	if err != nil {
@@ -112,21 +112,23 @@ func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserI
 		global.GVA_DB.Where("openid = ?", openid).First(&wechatUser)
 
 		uid := wechatUser.ID
+
 		if uid > 0 {
 			token, err = genToken(uid)
 			if err != nil {
 				return
 			} else {
-				return token, err
+				if wechatUser.Phone != "" {
+					exist = 1
+				}
+				return token, exist, err
 			}
 		} else {
+
 			wechatUser.Openid = openid
 			wechatUser.Nickname = info.Nickname
 			wechatUser.Avatar = info.Headimgurl
-			wechatUser.Name = userInfo.Name
-			wechatUser.Phone = userInfo.Phone
-			wechatUser.City = userInfo.City
-			wechatUser.Address = userInfo.Address
+
 			fmt.Println("Openid:", openid)
 			err = global.GVA_DB.Create(&wechatUser).Error
 			if err != nil {
@@ -140,9 +142,14 @@ func (wechatUserService *WechatUserService) Login(userInfo wechatReq.WechatUserI
 			}
 		}
 	} else {
-		err = errors.New("openid 为空")
+		err = errors.New("无法获取到openid")
 	}
 	return
+}
+
+func (wechatUserService *WechatUserService) SaveWechatUser(wechatUser wechat.WechatUser) (err error) {
+	err = global.GVA_DB.Model(&wechat.WechatUser{}).Where("id = ?", wechatUser.ID).Updates(wechatUser).Error
+	return err
 }
 
 // GenToken 生成JWT

@@ -1,9 +1,10 @@
 package wechat
 
 import (
+	"github.com/gin-gonic/gin"
+
 	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
 	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
-	"github.com/gin-gonic/gin"
 )
 
 type ScanRouter struct {
@@ -13,7 +14,7 @@ type ScanRouter struct {
 func (s *ScanRouter) InitScanRouter(Router *gin.RouterGroup) {
 	scanRouter := Router.Group("scan").Use(middleware.OperationRecord())
 	scanRouterWithoutRecord := Router.Group("scan")
-	scanPrivateRouter := Router.Group("scan").Use(middleware.JWTAuth())
+	scanPrivateRouter := Router.Group("scan").Use(middleware.JWTAuthMiddleware())
 	var scanApi = v1.ApiGroupApp.WechatApiGroup.ScanApi
 	{
 		scanRouter.POST("createScan", scanApi.CreateScan)             // 新建Scan

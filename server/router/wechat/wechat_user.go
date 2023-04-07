@@ -1,9 +1,10 @@
 package wechat
 
 import (
+	"github.com/gin-gonic/gin"
+
 	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
 	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
-	"github.com/gin-gonic/gin"
 )
 
 type WechatUserRouter struct {
@@ -15,6 +16,7 @@ func (s *WechatUserRouter) InitWechatUserRouter(Router *gin.RouterGroup) {
 	wechatUserRouterWithoutRecord := Router.Group("wechatUser")
 
 	wechatUserPublicRouter := Router.Group("user")
+	wechatUserPrivateRouter := Router.Group("user").Use(middleware.JWTAuthMiddleware())
 
 	var wechatUserApi = v1.ApiGroupApp.WechatApiGroup.WechatUserApi
 	{
@@ -33,4 +35,7 @@ func (s *WechatUserRouter) InitWechatUserRouter(Router *gin.RouterGroup) {
 		wechatUserPublicRouter.POST("upload", wechatUserApi.UploadFile) //上传文件
 	}
 
+	{
+		wechatUserPrivateRouter.POST("save", wechatUserApi.SaveUser) //更新用户信息
+	}
 }

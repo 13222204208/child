@@ -11,13 +11,14 @@ package initialize
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/docs"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
 	"github.com/flipped-aurora/gin-vue-admin/server/router"
-	"github.com/gin-gonic/gin"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 // 初始化总路由
@@ -96,6 +97,7 @@ func Routers() *gin.Engine {
 		wechatRouter.InitEmergencyAlertRouter(wechatGroup)
 		wechatRouter.InitIdentityRouter(wechatGroup)
 		wechatRouter.InitContactRouter(wechatGroup)
+		wechatRouter.InitScanRouter(wechatGroup)
 
 		wechatRouter.InitMessageRouter(PrivateGroup)
 		wechatRouter.InitBoardRouter(PrivateGroup)

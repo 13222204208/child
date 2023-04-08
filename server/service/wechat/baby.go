@@ -115,8 +115,8 @@ var ctx = context.Background()
 // 发送验证码
 func SendSms(phoneNumber string) error {
 	credential := common.NewCredential(
-		"AKIDTozylMrALI7j9MbGl6EAEAD3tvukLjut",
-		"ta8WikhVEpGk9TGwZCzdDmIqMuOwNdjo",
+		global.GVA_CONFIG.TencentCOS.SecretID,
+		global.GVA_CONFIG.TencentCOS.SecretKey,
 	)
 	// 实例化一个client选项，可选的，没有特殊需求可以跳过
 	cpf := profile.NewClientProfile()

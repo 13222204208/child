@@ -91,8 +91,8 @@ func (scanService *ScanService) Contrast(pic, address string, uid uint) (info we
 			imgBase64, _ := copilot.PrefixImgBase64(img)
 
 			credential := common.NewCredential(
-				"AKIDTozylMrALI7j9MbGl6EAEAD3tvukLjut",
-				"ta8WikhVEpGk9TGwZCzdDmIqMuOwNdjo",
+				global.GVA_CONFIG.TencentCOS.SecretID,
+				global.GVA_CONFIG.TencentCOS.SecretKey,
 			)
 			// 实例化一个client选项，可选的，没有特殊需求可以跳过
 			cpf := profile.NewClientProfile()

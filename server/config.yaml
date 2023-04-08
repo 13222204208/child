@@ -178,8 +178,8 @@ system:
 tencent-cos:
   bucket: xxxxx-10005608
   region: ap-shanghai
-  secret-id: your-secret-id
-  secret-key: your-secret-key
+  secret-id: AKIDTozylMrALI7j9MbGl6EAEAD3tvukLjut
+  secret-key: ta8WikhVEpGk9TGwZCzdDmIqMuOwNdjo
   base-url: https://gin.vue.admin
   path-prefix: github.com/flipped-aurora/gin-vue-admin/server
 timer:

@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand"
+	"strconv"
 	"time"
 
-	"github.com/13222204208/tool"
-	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
-	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/auth/credentials"
-	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	tencentErrors "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20210111"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
@@ -111,45 +114,43 @@ var ctx = context.Background()
 
 // 发送验证码
 func SendSms(phoneNumber string) error {
-	config := sdk.NewConfig()
+	credential := common.NewCredential(
+		"AKIDTozylMrALI7j9MbGl6EAEAD3tvukLjut",
+		"ta8WikhVEpGk9TGwZCzdDmIqMuOwNdjo",
+	)
+	// 实例化一个client选项，可选的，没有特殊需求可以跳过
+	cpf := profile.NewClientProfile()
+	cpf.HttpProfile.Endpoint = "sms.tencentcloudapi.com"
+	// 实例化要请求产品的client对象,clientProfile是可选的
+	client, _ := sms.NewClient(credential, "ap-beijing", cpf)
 
-	phoneKeyId := global.GVA_CONFIG.Phone.PhoneKeyId
-	phoneKeySecret := global.GVA_CONFIG.Phone.PhoneKeySecret
-	phoneSignName := global.GVA_CONFIG.Phone.PhoneSignName
-	phoneTemplateCode := global.GVA_CONFIG.Phone.PhoneTemplateCode
-	if phoneKeyId == "" || phoneKeySecret == "" {
-		return errors.New("请先配置阿里云短信服务")
+	// 实例化一个请求对象,每个接口都会对应一个request对象
+	request := sms.NewSendSmsRequest()
+	request.PhoneNumberSet = common.StringPtrs([]string{phoneNumber})
+	request.TemplateId = common.StringPtr("1757796")
+	request.SmsSdkAppId = common.StringPtr("1400809494")
+	//生成六位随机数
+	smsCode := strconv.Itoa(rand.Intn(899999) + 100000)
+	request.TemplateParamSet = common.StringPtrs([]string{smsCode})
+	// 返回的resp是一个SendSmsResponse的实例，与请求对象对应
+	fmt.Println("请求的数据", request.ToJsonString())
+	response, err := client.SendSms(request)
+	if _, ok := err.(*tencentErrors.TencentCloudSDKError); ok {
+		fmt.Printf("An API error has returned: %s", err)
+		return errors.New("发送验证码错误")
 	}
-
-	credential := credentials.NewAccessKeyCredential(phoneKeyId, phoneKeySecret)
-
-	client, err := dysmsapi.NewClientWithOptions("cn-qingdao", config, credential)
-	if err != nil {
-		panic(err)
-	}
-
-	r := dysmsapi.CreateSendSmsRequest()
-
-	r.SignName = phoneSignName
-	r.TemplateCode = phoneTemplateCode
-	r.PhoneNumbers = phoneNumber
-	r.Scheme = "https"
-
-	smsCode := tool.RandCode()
-	code := "{\"code\":" + smsCode + "}"
-
-	r.TemplateParam = code
-
-	response, err := client.SendSms(r)
-
 	if err != nil {
 		return errors.New("发送验证码错误")
-	} else {
-		global.GVA_REDIS.Set(ctx, phoneNumber, smsCode, time.Second*60*15)
-		fmt.Printf("response is %#v\n", response)
-		return nil
+	}
+	fmt.Printf("输出： %s", response.ToJsonString())
+	// 输出json格式的字符串回包
+	if response.Response.SendStatusSet[0].Code != nil {
+		fmt.Println(*response.Response.SendStatusSet[0].Code)
+		return errors.New("发送验证码错误")
 	}
 
+	global.GVA_REDIS.Set(ctx, phoneNumber, smsCode, time.Second*60*15)
+	return err
 }
 
 // 验证验证码是否正确

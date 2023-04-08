@@ -1,3 +1,0 @@
-[github.com/flipped-aurora/gin-vue-admin/server]2023/03/31 - 07:53:27.530	[31merror[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/core/server.go:48	accept tcp [::]:9529: use of closed network connection
-[github.com/flipped-aurora/gin-vue-admin/server]2023/03/31 - 16:01:19.383	[31merror[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/core/server.go:48	accept tcp [::]:9529: use of closed network connection
-[github.com/flipped-aurora/gin-vue-admin/server]2023/03/31 - 16:44:34.356	[31merror[0m	/Users/yangpanda/Desktop/private job/儿童防丢失系统/child/server/core/server.go:48	accept tcp [::]:9529: use of closed network connection

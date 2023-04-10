@@ -1,6 +1,9 @@
 package wechat
 
 import (
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
@@ -8,8 +11,6 @@ import (
 	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/service"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
 type BabyApi struct {
@@ -239,5 +240,21 @@ func (babyApi *BabyApi) SendCode(c *gin.Context) {
 		response.FailWithMessage("发送失败", c)
 	} else {
 		response.OkWithMessage("发送成功", c)
+	}
+}
+
+// verifyCode api
+func (babyApi *BabyApi) VerifyPhone(c *gin.Context) {
+	var p wechatReq.PhoneExist
+	err := c.ShouldBindJSON(&p)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if err := babyService.VerifyPhone(p.Phone, p.Code); err != nil {
+		global.GVA_LOG.Error("验证失败!", zap.Error(err))
+		response.FailWithMessage("验证失败", c)
+	} else {
+		response.OkWithMessage("验证成功", c)
 	}
 }

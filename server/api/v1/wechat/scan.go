@@ -2,6 +2,7 @@ package wechat
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -182,16 +183,29 @@ func (scanApi *ScanApi) Contrast(c *gin.Context) {
 		return
 	}
 
-	if scan.Address == "" {
-		response.FailWithMessage("地址不能为空", c)
-		return
-	}
-
 	uid := c.MustGet("id").(uint)
-	if info, err := scanService.Contrast(scan.Pic, scan.Address, uid); err != nil {
+	if info, err := scanService.Contrast(scan.Pic, scan.Lng, scan.Lat, uid); err != nil {
 		global.GVA_LOG.Error("保存失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 	} else {
 		response.OkWithData(gin.H{"info": info}, c)
+	}
+}
+
+// 扫描记录
+func (scanApi *ScanApi) ScanRecord(c *gin.Context) {
+	id := c.Param("id")
+	//id 转为uint
+	idUint, _ := strconv.ParseUint(id, 10, 64)
+	if idUint == 0 {
+		response.FailWithMessage("宝贝id不能为空", c)
+		return
+	}
+
+	if list, err := scanService.GetScanList(idUint); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithData(gin.H{"list": list}, c)
 	}
 }

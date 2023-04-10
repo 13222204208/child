@@ -190,8 +190,8 @@ func (contactApi *ContactApi) SaveContact(c *gin.Context) {
 	}
 
 	verify := utils.Rules{
-		"Phone":            {utils.NotEmpty()},
-		"EmergencyContact": {utils.NotEmpty()},
+		"Phone":  {utils.NotEmpty()},
+		"BabyId": {utils.NotEmpty()},
 	}
 	if err := utils.Verify(contact, verify); err != nil {
 		response.FailWithMessage(err.Error(), c)

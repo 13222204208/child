@@ -49,7 +49,7 @@
                   </el-icon>
                   {{ userStore.userInfo.nickName }}
                 </li>
-                <el-tooltip
+                <!-- <el-tooltip
                   class="item"
                   effect="light"
                   content="北京反转极光科技有限公司-技术部-前端事业群"
@@ -61,7 +61,7 @@
                     </el-icon>
                     北京反转极光科技有限公司-技术部-前端事业群
                   </li>
-                </el-tooltip>
+                </el-tooltip> -->
                 <li>
                   <el-icon>
                     <video-camera />

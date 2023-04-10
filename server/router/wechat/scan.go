@@ -28,5 +28,6 @@ func (s *ScanRouter) InitScanRouter(Router *gin.RouterGroup) {
 	}
 	{
 		scanPrivateRouter.POST("contrast", scanApi.Contrast) // 扫码对比
+		scanPrivateRouter.GET(":id", scanApi.ScanRecord)     // 获取扫描记录
 	}
 }

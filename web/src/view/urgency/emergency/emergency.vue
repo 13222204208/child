@@ -39,17 +39,26 @@
         <el-table-column align="left" label="日期" width="180">
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
-        <el-table-column align="left" label="走失位置" prop="lostLocation" width="120" />
-        <el-table-column align="left" label="走丢时间" prop="lostTime" width="120" />
+        <el-table-column align="left" label="走失位置" prop="lostLocation" width="220" />
+        <el-table-column align="left" label="走丢时间" prop="lostTime" width="180" />
         <!-- <el-table-column align="left" label="经度" prop="longitude" width="120" />
         <el-table-column align="left" label="纬度" prop="latitude" width="120" /> -->
-        <el-table-column align="left" label="宝贝ID" prop="babyId" width="120" />
-        <el-table-column align="left" label="紧急联系人" prop="contactPerson" width="120" />
-        <el-table-column align="left" label="其它特征" prop="otherFeatures" width="120" />
-        <el-table-column align="left" label="状态" prop="status" width="120" />
+        <!-- <el-table-column align="left" label="宝贝ID" prop="babyId" width="120" /> -->
+        <el-table-column align="left" label="紧急联系人" prop="contactPerson" width="220" >
+            <template #default="scope">
+                <el-popover placement="top" width="160" trigger="hover">
+                    <p>{{ parseJson(scope.row.contactPerson) }}</p>
+                    <template #reference>
+                        <span>{{ parseJson(scope.row.contactPerson) }}</span>
+                    </template>
+                </el-popover>
+            </template>
+          </el-table-column>
+        <el-table-column align="left" label="其它特征" prop="otherFeatures" width="180" />
+        <!-- <el-table-column align="left" label="状态" prop="status" width="120" /> -->
         <el-table-column align="left" label="按钮组">
             <template #default="scope">
-            <el-button type="primary" link icon="edit" class="table-button" @click="updateEmergencyAlertFunc(scope.row)">确认</el-button>
+            <!-- <el-button type="primary" link icon="edit" class="table-button" @click="updateEmergencyAlertFunc(scope.row)">确认</el-button> -->
             <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -180,7 +189,17 @@ const onSubmit = () => {
   pageSize.value = 10
   getTableData()
 }
-
+//解析json数组字符串
+const parseJson = (str) => {
+  if (str) {
+    const arr = JSON.parse(str)
+    console.log(arr)
+    if(arr.length>0){
+      return arr[0].shenfen+' '+arr[0].phone
+    }
+  }
+  return '无'
+}
 // 分页
 const handleSizeChange = (val) => {
   pageSize.value = val

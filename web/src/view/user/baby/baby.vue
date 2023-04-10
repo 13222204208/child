@@ -14,7 +14,7 @@
       </el-form>
     </div>
     <div class="gva-table-box">
-        <div class="gva-btn-list">
+        <!-- <div class="gva-btn-list">
             <el-button type="primary" icon="plus" @click="openDialog">新增</el-button>
             <el-popover v-model:visible="deleteVisible" placement="top" width="160">
             <p>确定要删除吗？</p>
@@ -26,7 +26,7 @@
                 <el-button icon="delete" style="margin-left: 10px;" :disabled="!multipleSelection.length" @click="deleteVisible = true">删除</el-button>
             </template>
             </el-popover>
-        </div>
+        </div> -->
         <el-table
         ref="multipleTable"
         style="width: 100%"
@@ -35,7 +35,7 @@
         row-key="ID"
         @selection-change="handleSelectionChange"
         >
-        <el-table-column type="selection" width="55" />
+        <!-- <el-table-column type="selection" width="55" /> -->
         <el-table-column align="left" label="日期" width="180">
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
@@ -46,13 +46,13 @@
             </template>
         </el-table-column>
         <el-table-column align="left" label="出生日期" prop="birthday" width="120" />
-        <el-table-column align="left" label="身高" prop="height" width="120" />
-        <el-table-column align="left" label="体重" prop="weight" width="120" />
+        <el-table-column align="left" label="身高(厘米)" prop="height" width="120" />
+        <el-table-column align="left" label="体重(千克)" prop="weight" width="120" />
         <el-table-column align="left" label="体貌特征" prop="appearance" width="120" />
-        <el-table-column align="left" label="所属用户ID" prop="uid" width="120" />
+        <!-- <el-table-column align="left" label="所属用户ID" prop="uid" width="120" /> -->
         <el-table-column align="left" label="按钮组">
             <template #default="scope">
-            <el-button type="primary" link icon="edit" class="table-button" @click="updateBabyFunc(scope.row)">变更</el-button>
+            <!-- <el-button type="primary" link icon="edit" class="table-button" @click="updateBabyFunc(scope.row)">变更</el-button> -->
             <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>

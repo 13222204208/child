@@ -17,3 +17,9 @@ type BabySearch struct {
 type SendCode struct {
 	Phone string `json:"phone" form:"phone" binding:"required"`
 }
+
+// 验证手机号是否存在
+type PhoneExist struct {
+	Phone string `json:"phone" form:"phone" binding:"required"`
+	Code  string `json:"code" form:"code" binding:"required"`
+}

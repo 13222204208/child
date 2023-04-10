@@ -1,9 +1,10 @@
 package wechat
 
 import (
+	"github.com/gin-gonic/gin"
+
 	v1 "github.com/flipped-aurora/gin-vue-admin/server/api/v1"
 	"github.com/flipped-aurora/gin-vue-admin/server/middleware"
-	"github.com/gin-gonic/gin"
 )
 
 type BabyRouter struct {
@@ -32,5 +33,7 @@ func (s *BabyRouter) InitBabyRouter(Router *gin.RouterGroup, privateRouter *gin.
 		babyPrivateRouter.GET(":id", babyApi.Info)
 		babyPrivateRouter.GET("list", babyApi.List)
 		babyPrivateRouter.POST("sendCode", babyApi.SendCode) // 发送验证码
+
+		babyPrivateRouter.POST("phone", babyApi.VerifyPhone) // 验证手机号是否存在
 	}
 }

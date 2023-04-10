@@ -77,7 +77,7 @@
     </div>
     <el-dialog
       v-model="addUserDialog"
-      custom-class="user-dialog"
+      class="user-dialog"
       title="用户"
       :show-close="false"
       :close-on-press-escape="false"
@@ -91,6 +91,16 @@
           <el-form-item v-if="dialogFlag === 'add'" label="密码" prop="password">
             <el-input v-model="userInfo.password" />
           </el-form-item>
+
+          <el-form-item>
+            <el-cascader
+              size="large"
+              :options="options"
+              v-model="selectedOptions"
+              @change="handleChange">
+            </el-cascader>
+          </el-form-item>
+          
           <el-form-item label="昵称" prop="nickName">
             <el-input v-model="userInfo.nickName" />
           </el-form-item>
@@ -161,7 +171,9 @@ import ChooseImg from '@/components/chooseImg/index.vue'
 import WarningBar from '@/components/warningBar/warningBar.vue'
 import { setUserInfo, resetPassword } from '@/api/user.js'
 
-import { nextTick, ref, watch } from 'vue'
+import { provinceAndCityData , CodeToText} from 'element-china-area-data'
+
+import { nextTick, ref, watch,onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const path = ref(import.meta.env.VITE_BASE_API + '/')
 // 初始化相关
@@ -185,6 +197,17 @@ const setAuthorityOptions = (AuthorityData, optionsData) => {
           }
         })
 }
+
+    const selectedOptions = ref([]);
+    const options = ref(provinceAndCityData);
+    const city = ref("");
+
+    const  handleChange = (value) =>{
+        const c  = CodeToText[value[value.length-1]]
+        city.value = c
+        console.log("选中的",city)
+      }
+
 
 const page = ref(1)
 const total = ref(0)

@@ -14,7 +14,7 @@
       </el-form>
     </div>
     <div class="gva-table-box">
-        <div class="gva-btn-list">
+        <!-- <div class="gva-btn-list">
             <el-button type="primary" icon="plus" @click="openDialog">新增</el-button>
             <el-popover v-model:visible="deleteVisible" placement="top" width="160">
             <p>确定要删除吗？</p>
@@ -26,7 +26,7 @@
                 <el-button icon="delete" style="margin-left: 10px;" :disabled="!multipleSelection.length" @click="deleteVisible = true">删除</el-button>
             </template>
             </el-popover>
-        </div>
+        </div> -->
         <el-table
         ref="multipleTable"
         style="width: 100%"
@@ -35,20 +35,20 @@
         row-key="ID"
         @selection-change="handleSelectionChange"
         >
-        <el-table-column type="selection" width="55" />
+        <!-- <el-table-column type="selection" width="55" /> -->
         <el-table-column align="left" label="日期" width="180">
             <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
         </el-table-column>
-        <el-table-column align="left" label="openid" prop="openid" width="120" />
-        <el-table-column align="left" label="unionid" prop="unionid" width="120" />
+        <el-table-column align="left" label="openid" prop="openid" width="260" />
+        <!-- <el-table-column align="left" label="unionid" prop="unionid" width="120" /> -->
         <el-table-column align="left" label="姓名" prop="name" width="120" />
         <el-table-column align="left" label="电话" prop="phone" width="120" />
-        <el-table-column align="left" label="地址" prop="address" width="120" />
-        <el-table-column align="left" label="状态" prop="status" width="120">
+        <el-table-column align="left" label="地址" prop="address" width="220" />
+        <!-- <el-table-column align="left" label="状态" prop="status" width="120">
             <template #default="scope">
             {{ filterDict(scope.row.status,statusOptions) }}
             </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column align="left" label="按钮组">
             <template #default="scope">
             <el-button type="primary" link icon="edit" class="table-button" @click="updateWechatUserFunc(scope.row)">变更</el-button>

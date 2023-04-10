@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
@@ -41,10 +43,10 @@ func (emergencyAlertService *EmergencyAlertService) DeleteEmergencyAlertByIds(id
 // UpdateEmergencyAlert 更新EmergencyAlert记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (emergencyAlertService *EmergencyAlertService) UpdateEmergencyAlert(emergencyAlert wechat.EmergencyAlert) (err error) {
-	if *emergencyAlert.Status == 1 {
-		// 发送模板消息
-		SendTextMessage(emergencyAlert.ID)
-	}
+	// if *emergencyAlert.Status == 1 {
+	// 	// 发送模板消息
+	// 	SendTextMessage(emergencyAlert)
+	// }
 	err = global.GVA_DB.Save(&emergencyAlert).Error
 	return err
 }
@@ -79,8 +81,114 @@ func (emergencyAlertService *EmergencyAlertService) GetEmergencyAlertInfoList(in
 
 // save a emergencyAlert record
 func (emergencyAlertService *EmergencyAlertService) Issue(emergencyAlert wechat.EmergencyAlert) (err error) {
+
 	err = global.GVA_DB.Save(&emergencyAlert).Error
+	if err == nil {
+		//修改babyId status 为2
+		err = global.GVA_DB.Model(&wechat.Baby{}).Where("id = ?", emergencyAlert.BabyId).Update("status", 2).Error
+
+		SendTextMessage(emergencyAlert)
+	}
 	return err
+}
+
+type templateList struct {
+	Openid   string `json:"openid"`
+	Appid    string `json:"appid"`
+	Secret   string `json:"secret"`
+	Token    string `json:"token"`
+	Phone    string `json:"phone"`
+	Remark   string `json:"remark"`
+	BabyId   string `json:"babyId"`
+	LostTime string `json:"lostTime"`
+}
+
+// 发送订阅消息给用户
+// func PushTextMessage(t *templateList) (err error) {
+// 	wc := sWechat.NewWechat()
+// 	memory := cache.NewMemory()
+// 	cfg := &config.Config{
+// 		AppID:     t.Appid,
+// 		AppSecret: t.Secret,
+// 		Token:     t.Token,
+// 		Cache:     memory,
+// 	}
+// 	officialAccount := wc.GetOfficialAccount(cfg)
+// 	s := officialAccount.GetSubscribe()
+// 	var sm message.SubscribeMessage
+// 	sm.ToUser = t.Openid
+// 	sm.TemplateID = "bPXvnSLbyh9GBIrW22fdIJnSrlU4wBm_7eCExLKA8qM"
+// 	sm.Page = "https://huzhu.cnecip.com/wechat/"
+// 	sm.Data = map[string]*message.SubscribeDataItem{
+// 		"thing2": {
+// 			Value: "测试",
+// 		},
+// 		"date3": {
+// 			Value: "2022-01-12",
+// 		},
+// 		"thing4": {
+// 			Value: "测试",
+// 		},
+// 	}
+
+// 	return s.Send(&sm)
+// }
+
+type SubscribeMessage struct {
+	ToUser      string                        `json:"touser"`        // 必须, 接受者OpenID
+	TemplateID  string                        `json:"template_id"`   // 必须, 模版ID
+	Url         string                        `json:"url,omitempty"` // 可选, 跳转网页时填写
+	Data        map[string]*SubscribeDataItem `json:"data"`          // 必须, 模板数据
+	MiniProgram struct {
+		AppID    string `json:"appid"`    // 所需跳转到的小程序appid（该小程序appid必须与发模板消息的公众号是绑定关联关系）
+		PagePath string `json:"pagepath"` // 所需跳转到小程序的具体页面路径，支持带参数,（示例index?foo=bar）
+	} `json:"miniprogram"` // 可选,跳转至小程序地址
+}
+
+// SubscribeDataItem 模版内某个 .DATA 的值
+type SubscribeDataItem struct {
+	Value string `json:"value"`
+}
+
+// 发送模板消息给用户
+func SendTextMessageToUser(t *templateList) (err error) {
+	var sm SubscribeMessage
+	sm.ToUser = t.Openid
+	sm.TemplateID = "1f46L-66R2WZAeqk-sH60nmP44-_vMKE1eAv27-EjFQ"
+	sm.Url = "https://huzhu.cnecip.com/wechat/#/pages/zhoubian/detail?id=" + t.BabyId
+	//当前日期 年月日时分秒
+	now := time.Now().Format("2006-01-02 15:04:05")
+	sm.Data = map[string]*SubscribeDataItem{
+		"first": {
+			Value: "走失信息",
+		},
+		"keyword1": {
+			Value: t.Phone,
+		},
+		"keyword2": {
+			Value: now,
+		},
+		"remark": {
+			Value: t.Remark,
+		},
+	}
+	//发送post请求
+	url := "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + t.Token
+	jsonStr, _ := json.Marshal(sm)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	body, _ := io.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
+	return
+
 }
 
 // GetEmergencyAlertList
@@ -96,7 +204,7 @@ func (emergencyAlertService *EmergencyAlertService) GetEmergencyAlertById(id int
 }
 
 // 给微信公众号用户发送文本消息
-func SendTextMessage(emergencyID uint) (err error) {
+func SendTextMessage(e wechat.EmergencyAlert) (err error) {
 	appid := global.GVA_CONFIG.Wechat.Appid
 	secret := global.GVA_CONFIG.Wechat.Secret
 	if appid == "" || secret == "" {
@@ -106,15 +214,38 @@ func SendTextMessage(emergencyID uint) (err error) {
 	if err != nil {
 		return errors.New(err.Error())
 	}
-	fmt.Println("token", accessToken)
-	openid := "omzzn5tfhfJ2MTKjXK0oVYTuRmUs"
-	content := "消息内容"
-	res, err := PushTextMessage(accessToken, openid, content)
+	//从e.ContactPerson  json字符中 中解析出phone
+	type ContactPerson struct {
+		Phone   string `json:"phone"`
+		ShenFen string `json:"shenfen"`
+		Code    string `json:"code"`
+		Checked bool   `json:"checked"`
+	}
+	var contactPerson []ContactPerson
+	_ = json.Unmarshal([]byte(e.ContactPerson), &contactPerson)
+	fmt.Println("contactPerson联系人", contactPerson)
+	var t templateList
+	t.Appid = appid
+	t.Token = accessToken
+	t.Secret = secret
+	t.LostTime = e.LostTime
+	t.Remark = "走失地址：" + e.LostLocation
+	t.Phone = contactPerson[0].Phone
+	//babayId 转为字符串
+	t.BabyId = strconv.Itoa(*e.BabyId)
+
+	//查询所有用户的openid
+	var users []wechat.WechatUser
+	err = global.GVA_DB.Find(&users).Error
 	if err != nil {
 		return errors.New(err.Error())
 	}
-	fmt.Println("返回的", res)
-	return nil
+	for _, v := range users {
+		t.Openid = v.Openid
+		err = SendTextMessageToUser(&t)
+	}
+	fmt.Println("发送状态", err)
+	return
 }
 
 type AccessTokenResponse struct {
@@ -146,27 +277,6 @@ type TextMessage struct {
 	Text    struct {
 		Content string `json:"content"`
 	} `json:"text"`
-}
-
-func PushTextMessage(accessToken string, toUser string, content string) (res interface{}, err error) {
-	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s", accessToken)
-
-	message := TextMessage{
-		ToUser:  toUser,
-		MsgType: "text",
-		Text: struct {
-			Content string `json:"content"`
-		}{
-			Content: content,
-		},
-	}
-
-	body, err := json.Marshal(message)
-	if err != nil {
-		return res, err
-	}
-	res, err = PostJson(url, body)
-	return res, err
 }
 
 func PostJson(url string, jsonBytes []byte) (str string, err error) {

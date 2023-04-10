@@ -118,6 +118,7 @@ func SendSms(phoneNumber string) error {
 		global.GVA_CONFIG.TencentCOS.SecretID,
 		global.GVA_CONFIG.TencentCOS.SecretKey,
 	)
+
 	// 实例化一个client选项，可选的，没有特殊需求可以跳过
 	cpf := profile.NewClientProfile()
 	cpf.HttpProfile.Endpoint = "sms.tencentcloudapi.com"
@@ -129,6 +130,7 @@ func SendSms(phoneNumber string) error {
 	request.PhoneNumberSet = common.StringPtrs([]string{phoneNumber})
 	request.TemplateId = common.StringPtr("1757796")
 	request.SmsSdkAppId = common.StringPtr("1400809494")
+	request.SignName = common.StringPtr("全民互助公众号")
 	//生成六位随机数
 	smsCode := strconv.Itoa(rand.Intn(899999) + 100000)
 	request.TemplateParamSet = common.StringPtrs([]string{smsCode})
@@ -143,13 +145,21 @@ func SendSms(phoneNumber string) error {
 		return errors.New("发送验证码错误")
 	}
 	fmt.Printf("输出： %s", response.ToJsonString())
+	code := *response.Response.SendStatusSet[0].Code
+	fmt.Println(code, "code")
 	// 输出json格式的字符串回包
-	if response.Response.SendStatusSet[0].Code != nil {
+	if code != "Ok" {
 		fmt.Println(*response.Response.SendStatusSet[0].Code)
 		return errors.New("发送验证码错误")
 	}
 
 	global.GVA_REDIS.Set(ctx, phoneNumber, smsCode, time.Second*60*15)
+	return err
+}
+
+// 添加验证手机号是否正确服务
+func (babyService *BabyService) VerifyPhone(phoneNumber, phoneCode string) (err error) {
+	err = VerifyPhoneCode(phoneNumber, phoneCode)
 	return err
 }
 

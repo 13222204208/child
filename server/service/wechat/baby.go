@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/13222204208/copilot"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	tencentErrors "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
@@ -17,6 +18,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
 	wechatReq "github.com/flipped-aurora/gin-vue-admin/server/model/wechat/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat/response"
 )
 
 type BabyService struct {
@@ -47,6 +49,11 @@ func (babyService *BabyService) DeleteBabyByIds(ids request.IdsReq) (err error) 
 // Author [piexlmax](https://github.com/piexlmax)
 func (babyService *BabyService) UpdateBaby(baby wechat.Baby) (err error) {
 	err = global.GVA_DB.Save(&baby).Error
+
+	if baby.Status == 1 {
+		//删除宝贝预警信息
+		err = global.GVA_DB.Where("baby_id = ?", baby.ID).Delete(&wechat.EmergencyAlert{}).Error
+	}
 	return err
 }
 
@@ -82,7 +89,16 @@ func (babyService *BabyService) GetBabyInfoList(info wechatReq.BabySearch) (list
 func (babyService *BabyService) SaveBabyInfo(baby wechat.Baby) (babyId uint, err error) {
 	//根据baby的uid和name查询是否存在
 	if baby.ID != 0 {
-		// err = global.GVA_DB.Save(&baby).Error
+		if baby.Image != "" {
+			faceId, err := response.SaveFaceId(baby.Image, baby.ID)
+			if err != nil {
+				return 0, err
+			}
+			if faceId != "" {
+				baby.FaceId = faceId
+			}
+		}
+
 		err = global.GVA_DB.Model(&baby).Updates(baby).Error
 		babyId = baby.ID
 		return
@@ -93,7 +109,8 @@ func (babyService *BabyService) SaveBabyInfo(baby wechat.Baby) (babyId uint, err
 	babyId = babyInfo.ID
 	fmt.Println("babyId", babyId)
 	if err != nil {
-		//不存在则创建
+		baby.PersonId = copilot.UserNum()
+		baby.GroupId = "personInfo"
 		err = global.GVA_DB.Save(&baby).Error
 		babyId = baby.ID
 		fmt.Println("babyId2", babyId)

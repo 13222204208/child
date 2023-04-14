@@ -5,7 +5,7 @@
         <div class="gva-top-card-left">
           <div class="gva-top-card-left-title">早安，管理员，请开始一天的工作吧</div>
           <div class="gva-top-card-left-dot">{{ weatherInfo }}</div>
-          <div class="gva-top-card-left-rows">
+          <!-- <div class="gva-top-card-left-rows">
             <el-row>
               <el-col :span="8" :xs="24" :sm="8">
                 <div class="flex-center">
@@ -50,7 +50,7 @@
                 href="https://plugin.gin-vue-admin.com/#/layout/home"
               >https://plugin.gin-vue-admin.com</a>
             </div>
-          </div>
+          </div> -->
         </div>
         <img src="@/assets/dashboard.png" class="gva-top-card-right" alt>
       </div>
@@ -84,7 +84,7 @@
       </el-card>
     <!-- <div class="quick-entrance-title"></div> -->
     </div>
-    <div class="gva-card-box">
+    <!-- <div class="gva-card-box">
       <div class="gva-card">
         <div class="card-header">
           <span>数据统计</span>
@@ -100,7 +100,7 @@
           </el-row>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

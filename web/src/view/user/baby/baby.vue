@@ -49,10 +49,15 @@
         <el-table-column align="left" label="身高(厘米)" prop="height" width="120" />
         <el-table-column align="left" label="体重(千克)" prop="weight" width="120" />
         <el-table-column align="left" label="体貌特征" prop="appearance" width="120" />
-        <!-- <el-table-column align="left" label="所属用户ID" prop="uid" width="120" /> -->
-        <el-table-column align="left" label="按钮组">
+        <el-table-column align="left" label="安全状态" prop="status" width="120">
             <template #default="scope">
-            <!-- <el-button type="primary" link icon="edit" class="table-button" @click="updateBabyFunc(scope.row)">变更</el-button> -->
+            {{ scope.row.status == 1?"安全":"危险" }}
+            </template>
+        </el-table-column>
+        <!-- <el-table-column align="left" label="所属用户ID" prop="uid" width="120" /> -->
+        <el-table-column align="left" label="按钮组" width="180">
+            <template #default="scope">
+            <el-button type="primary" link icon="edit" class="table-button" @click="updateBabyFunc(scope.row)">变更</el-button>
             <el-button type="primary" link icon="delete" @click="deleteRow(scope.row)">删除</el-button>
             </template>
         </el-table-column>
@@ -79,21 +84,28 @@
             <el-option v-for="(item,key) in genderOptions" :key="key" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="出生日期:"  prop="birthday" >
+        <!-- <el-form-item label="出生日期:"  prop="birthday" >
           <el-input v-model="formData.birthday" :clearable="false"  placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="身高:"  prop="height" >
+        </el-form-item> -->
+        <el-form-item label="身高(厘米):"  prop="height" >
           <el-input-number v-model="formData.height"  style="width:100%" :precision="2" :clearable="false"  />
         </el-form-item>
-        <el-form-item label="体重:"  prop="weight" >
+        <el-form-item label="体重(千克):"  prop="weight" >
           <el-input-number v-model="formData.weight"  style="width:100%" :precision="2" :clearable="true"  />
         </el-form-item>
-        <el-form-item label="体貌特征:"  prop="appearance" >
+        <el-form-item label="安全状态:"  prop="status" >
+       
+          <el-radio-group v-model="formData.status">
+            <el-radio :label=1>安全</el-radio>
+            <el-radio :label=2>危险</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- <el-form-item label="体貌特征:"  prop="appearance" >
           <el-input v-model="formData.appearance" :clearable="false"  placeholder="请输入" />
-        </el-form-item>
-        <el-form-item label="所属用户ID:"  prop="uid" >
+        </el-form-item> -->
+        <!-- <el-form-item label="所属用户ID:"  prop="uid" >
           <el-input v-model.number="formData.uid" :clearable="false" placeholder="请输入" />
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -136,6 +148,7 @@ const formData = ref({
         weight: 0,
         appearance: '',
         uid: 0,
+        status: 1,
         })
 
 // 验证规则

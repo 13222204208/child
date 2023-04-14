@@ -183,12 +183,17 @@ func (scanApi *ScanApi) Contrast(c *gin.Context) {
 		return
 	}
 
+	if scan.Lng == 0 || scan.Lat == 0 {
+		response.FailWithMessage("经纬度不能为空", c)
+		return
+	}
+
 	uid := c.MustGet("id").(uint)
-	if info, err := scanService.Contrast(scan.Pic, scan.Lng, scan.Lat, uid); err != nil {
+	if info, eid, err := scanService.Contrast(scan.Pic, scan.Lng, scan.Lat, uid); err != nil {
 		global.GVA_LOG.Error("保存失败!", zap.Error(err))
 		response.FailWithMessage(err.Error(), c)
 	} else {
-		response.OkWithData(gin.H{"info": info}, c)
+		response.OkWithData(gin.H{"info": info, "eid": eid}, c)
 	}
 }
 

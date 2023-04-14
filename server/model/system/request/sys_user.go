@@ -9,6 +9,7 @@ type Register struct {
 	Username     string `json:"userName" example:"用户名"`
 	Password     string `json:"passWord" example:"密码"`
 	NickName     string `json:"nickName" example:"昵称"`
+	City         string `json:"city" example:"城市"`
 	HeaderImg    string `json:"headerImg" example:"头像链接"`
 	AuthorityId  uint   `json:"authorityId" swaggertype:"string" example:"int 角色id"`
 	Enable       int    `json:"enable" swaggertype:"string" example:"int 是否启用"`

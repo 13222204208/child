@@ -2,12 +2,13 @@ package wechat
 
 import (
 	"fmt"
-	"net/http"
+	"image/jpeg"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/nfnt/resize"
 	"go.uber.org/zap"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -218,7 +219,7 @@ func (wechatUserApi *WechatUserApi) SaveUser(c *gin.Context) {
 func (wechatUserApi *WechatUserApi) UploadFile(c *gin.Context) {
 	file, err := c.FormFile("image")
 	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("error: %s", err.Error()))
+		response.FailWithMessage(err.Error(), c)
 		return
 	}
 
@@ -243,5 +244,63 @@ func (wechatUserApi *WechatUserApi) UploadFile(c *gin.Context) {
 		return
 	} else {
 		response.OkWithData(gin.H{"path": targetPath}, c)
+	}
+}
+
+// 压缩图片
+func (wechatUserApi *WechatUserApi) CompressImage(c *gin.Context) {
+	file, err := c.FormFile("image")
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	// 打开上传的文件
+	f, err := file.Open()
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	defer f.Close()
+	// 解码文件
+	img, err := jpeg.Decode(f)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	// 调整大小
+	resized := resize.Resize(600, 0, img, resize.Lanczos3)
+
+	// 根据日期创建目录
+	dateDir := time.Now().Format("20060102")
+	targetDir := filepath.Join("uploads/file/pic", dateDir)
+	fmt.Println("图片路径", targetDir)
+	// 创建目录
+	if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	// 生成文件名
+	ext := filepath.Ext(file.Filename)
+	filename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+
+	targetPath := filepath.Join(targetDir, filename)
+	// 创建一个新的文件
+	outFile, err := os.Create(targetPath)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	defer outFile.Close()
+
+	// 将压缩后的图片写入新的文件中
+	if err := jpeg.Encode(outFile, resized, nil); err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	} else {
+		response.OkWithData(gin.H{"path": targetPath}, c)
+		return
 	}
 }

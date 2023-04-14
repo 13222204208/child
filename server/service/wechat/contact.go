@@ -1,6 +1,9 @@
 package wechat
 
 import (
+	"errors"
+	"strconv"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/wechat"
@@ -69,5 +72,51 @@ func (contactService *ContactService) GetContactInfoList(info wechatReq.ContactS
 // save contact
 func (contactService *ContactService) SaveContact(contact wechat.Contact) (err error) {
 	err = global.GVA_DB.Save(&contact).Error
+	if err == nil {
+		//发送信息给宝贝的家长
+		err = SendMsgToParent(contact)
+	}
+	return err
+}
+
+// 发送信息给宝贝的家长
+func SendMsgToParent(contact wechat.Contact) (err error) {
+
+	appid := global.GVA_CONFIG.Wechat.Appid
+	secret := global.GVA_CONFIG.Wechat.Secret
+	if appid == "" || secret == "" {
+		return errors.New("appid或secret为空")
+	}
+	accessToken, err := GetWechatAccessToken(appid, secret)
+	if err != nil {
+		return errors.New(err.Error())
+	}
+
+	//获取宝贝信息
+	babyId := contact.BabyId
+	babyService := BabyService{}
+	baby, err := babyService.GetBaby(babyId)
+	if err != nil {
+		return err
+	}
+	//获取宝贝的家长信息
+	parentService := WechatUserService{}
+	parents, err := parentService.GetWechatUser(baby.Uid)
+	if err != nil {
+		return err
+	}
+	var t TemplateList
+	t.Appid = appid
+	t.Token = accessToken
+	t.Secret = secret
+	t.Openid = parents.Openid
+	t.Phone = contact.Phone
+	t.Remark = contact.Message
+	//babyId 转为字符串
+	t.BabyId = strconv.Itoa(int(babyId))
+	t.Url = "https://huzhu.cnecip.com/wechat/#/pages/zhoubian/saomiao"
+	//当前时间
+	t.LostTime = contact.CreatedAt.Format("2006-01-02 15:04:05")
+	err = SendTextMessageToUser(&t)
 	return err
 }

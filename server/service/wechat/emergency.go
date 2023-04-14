@@ -92,7 +92,7 @@ func (emergencyAlertService *EmergencyAlertService) Issue(emergencyAlert wechat.
 	return err
 }
 
-type templateList struct {
+type TemplateList struct {
 	Openid   string `json:"openid"`
 	Appid    string `json:"appid"`
 	Secret   string `json:"secret"`
@@ -101,6 +101,7 @@ type templateList struct {
 	Remark   string `json:"remark"`
 	BabyId   string `json:"babyId"`
 	LostTime string `json:"lostTime"`
+	Url      string `json:"url"`
 }
 
 // 发送订阅消息给用户
@@ -151,16 +152,16 @@ type SubscribeDataItem struct {
 }
 
 // 发送模板消息给用户
-func SendTextMessageToUser(t *templateList) (err error) {
+func SendTextMessageToUser(t *TemplateList) (err error) {
 	var sm SubscribeMessage
 	sm.ToUser = t.Openid
 	sm.TemplateID = "1f46L-66R2WZAeqk-sH60nmP44-_vMKE1eAv27-EjFQ"
-	sm.Url = "https://huzhu.cnecip.com/wechat/#/pages/zhoubian/detail?id=" + t.BabyId
+	sm.Url = t.Url
 	//当前日期 年月日时分秒
 	now := time.Now().Format("2006-01-02 15:04:05")
 	sm.Data = map[string]*SubscribeDataItem{
 		"first": {
-			Value: "走失信息",
+			Value: "人员信息",
 		},
 		"keyword1": {
 			Value: t.Phone,
@@ -193,7 +194,7 @@ func SendTextMessageToUser(t *templateList) (err error) {
 
 // GetEmergencyAlertList
 func (emergencyAlertService *EmergencyAlertService) GetEmergencyAlertList() (emergencyAlerts []wechat.EmergencyAlert, err error) {
-	err = global.GVA_DB.Find(&emergencyAlerts).Error
+	err = global.GVA_DB.Order("id DESC").Find(&emergencyAlerts).Error
 	return
 }
 
@@ -224,7 +225,7 @@ func SendTextMessage(e wechat.EmergencyAlert) (err error) {
 	var contactPerson []ContactPerson
 	_ = json.Unmarshal([]byte(e.ContactPerson), &contactPerson)
 	fmt.Println("contactPerson联系人", contactPerson)
-	var t templateList
+	var t TemplateList
 	t.Appid = appid
 	t.Token = accessToken
 	t.Secret = secret
@@ -233,7 +234,9 @@ func SendTextMessage(e wechat.EmergencyAlert) (err error) {
 	t.Phone = contactPerson[0].Phone
 	//babayId 转为字符串
 	t.BabyId = strconv.Itoa(*e.BabyId)
-
+	id := strconv.Itoa(int(e.ID))
+	fmt.Println("发送预警的babyId:", t.BabyId)
+	t.Url = "https://huzhu.cnecip.com/wechat/#/pages/zhoubian/detail?id=" + id
 	//查询所有用户的openid
 	var users []wechat.WechatUser
 	err = global.GVA_DB.Find(&users).Error

@@ -17,6 +17,7 @@
         <el-table-column align="left" label="ID" min-width="50" prop="ID" />
         <el-table-column align="left" label="用户名" min-width="150" prop="userName" />
         <el-table-column align="left" label="昵称" min-width="150" prop="nickName" />
+        <el-table-column align="left" label="代理城市" min-width="150" prop="city" />
         <el-table-column align="left" label="手机号" min-width="180" prop="phone" />
         <el-table-column align="left" label="邮箱" min-width="180" prop="email" />
         <el-table-column align="left" label="用户角色" min-width="200">
@@ -92,7 +93,7 @@
             <el-input v-model="userInfo.password" />
           </el-form-item>
 
-          <el-form-item>
+          <el-form-item label="代理城市">
             <el-cascader
               size="large"
               :options="options"
@@ -200,12 +201,13 @@ const setAuthorityOptions = (AuthorityData, optionsData) => {
 
     const selectedOptions = ref([]);
     const options = ref(provinceAndCityData);
-    const city = ref("");
+  
 
     const  handleChange = (value) =>{
-        const c  = CodeToText[value[value.length-1]]
-        city.value = c
-        console.log("选中的",city)
+        const c  = CodeToText[value[0]]+ CodeToText[value[1]]
+        userInfo.value.city = c
+   
+        console.log("选中的",c)
       }
 
 
@@ -305,6 +307,7 @@ const deleteUserFunc = async(row) => {
 const userInfo = ref({
   username: '',
   password: '',
+  city: '',
   nickName: '',
   headerImg: '',
   authorityId: '',
